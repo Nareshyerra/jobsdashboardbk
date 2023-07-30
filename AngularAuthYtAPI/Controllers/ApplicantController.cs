@@ -19,21 +19,21 @@ namespace AngularAuthYtAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class ApplicantController : ControllerBase
     {
         private readonly AppDbContext _authContext;
-        public UserController(AppDbContext context)
+        public ApplicantController(AppDbContext context)
         {
             _authContext = context;
         }
 
         [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody] User userObj)
+        public async Task<IActionResult> Authenticate([FromBody] applicant userObj)
         {
             if (userObj == null)
                 return BadRequest();
 
-            var user = await _authContext.Users
+            var user = await _authContext.Applicant
                 .FirstOrDefaultAsync(x => x.Username == userObj.Username);
 
             if (user == null)
@@ -59,40 +59,40 @@ namespace AngularAuthYtAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> AddUser([FromBody] User userObj)
+        public async Task<IActionResult> AddApplicant([FromBody] applicant applicantObj)
         {
-            if (userObj == null)
+            if (applicantObj == null)
                 return BadRequest();
 
             // check email
-            if (await CheckEmailExistAsync(userObj.Email))
-                return BadRequest(new { Message = "Email Already Exist" });
+            if (await CheckEmailExistAsync(applicantObj.Email))
+                return BadRequest(new { Message = "Email Already Exists" });
 
             //check username
-            if (await CheckUsernameExistAsync(userObj.Username))
-                return BadRequest(new { Message = "Username Already Exist" });
+            if (await CheckUsernameExistAsync(applicantObj.Username))
+                return BadRequest(new { Message = "Username Already Exists" });
 
-            var passMessage = CheckPasswordStrength(userObj.Password);
+            var passMessage = CheckPasswordStrength(applicantObj.Password);
             if (!string.IsNullOrEmpty(passMessage))
                 return BadRequest(new { Message = passMessage.ToString() });
 
-            userObj.Password = PasswordHasher.HashPassword(userObj.Password);
-            userObj.Role = "User";
-            userObj.Token = "";
-            await _authContext.AddAsync(userObj);
+            applicantObj.Password = PasswordHasher.HashPassword(applicantObj.Password);
+            applicantObj.Role = "Applicant";
+            applicantObj.Token = "";
+            await _authContext.AddAsync(applicantObj);
             await _authContext.SaveChangesAsync();
             return Ok(new
             {
                 Status = 200,
-                Message = "User Added!"
+                Message = "Applicant Added!"
             });
         }
 
         private Task<bool> CheckEmailExistAsync(string? email)
-            => _authContext.Users.AnyAsync(x => x.Email == email);
+            => _authContext.Applicant.AnyAsync(x => x.Email == email);
 
         private Task<bool> CheckUsernameExistAsync(string? username)
-            => _authContext.Users.AnyAsync(x => x.Email == username);
+            => _authContext.Applicant.AnyAsync(x => x.Email == username);
 
         private static string CheckPasswordStrength(string pass)
         {
@@ -102,11 +102,11 @@ namespace AngularAuthYtAPI.Controllers
             if (!(Regex.IsMatch(pass, "[a-z]") && Regex.IsMatch(pass, "[A-Z]") && Regex.IsMatch(pass, "[0-9]")))
                 sb.Append("Password should be AlphaNumeric" + Environment.NewLine);
             if (!Regex.IsMatch(pass, "[<,>,@,!,#,$,%,^,&,*,(,),_,+,\\[,\\],{,},?,:,;,|,',\\,.,/,~,`,-,=]"))
-                sb.Append("Password should contain special charcter" + Environment.NewLine);
+                sb.Append("Password should contain special characters" + Environment.NewLine);
             return sb.ToString();
         }
 
-        private string CreateJwt(User user)
+        private string CreateJwt(applicant user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("veryverysceret.....");
@@ -133,7 +133,7 @@ namespace AngularAuthYtAPI.Controllers
             var tokenBytes = RandomNumberGenerator.GetBytes(64);
             var refreshToken = Convert.ToBase64String(tokenBytes);
 
-            var tokenInUser = _authContext.Users
+            var tokenInUser = _authContext.Applicant
                 .Any(a => a.RefreshToken == refreshToken);
             if (tokenInUser)
             {
@@ -155,23 +155,23 @@ namespace AngularAuthYtAPI.Controllers
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             SecurityToken securityToken;
-            var principal = tokenHandler.ValidateToken(token,tokenValidationParameters, out securityToken);
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out securityToken);
             var jwtSecurityToken = securityToken as JwtSecurityToken;
             if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
                 throw new SecurityTokenException("This is Invalid Token");
             return principal;
-                
+
         }
 
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<User>> GetAllUsers()
+        public async Task<ActionResult<applicant>> GetAllApplicants()
         {
-            return Ok(await _authContext.Users.ToListAsync());
+            return Ok(await _authContext.Applicant.ToListAsync());
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh([FromBody]TokenApiDto tokenApiDto)
+        public async Task<IActionResult> Refresh([FromBody] TokenApiDto tokenApiDto)
         {
             if (tokenApiDto is null)
                 return BadRequest("Invalid Client Request");
@@ -179,7 +179,7 @@ namespace AngularAuthYtAPI.Controllers
             string refreshToken = tokenApiDto.RefreshToken;
             var principal = GetPrincipleFromExpiredToken(accessToken);
             var username = principal.Identity.Name;
-            var user = await _authContext.Users.FirstOrDefaultAsync(u => u.Username == username);
+            var user = await _authContext.Applicant.FirstOrDefaultAsync(a => a.Username == username);
             if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
                 return BadRequest("Invalid Request");
             var newAccessToken = CreateJwt(user);
@@ -193,5 +193,4 @@ namespace AngularAuthYtAPI.Controllers
             });
         }
     }
-
 }
