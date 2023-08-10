@@ -22,7 +22,14 @@ namespace AngularAuthYtAPI.Models
         public string? FilePath { get; set; }
         public byte[] FileData { get; set; } // Binary data of the uploaded resume file
 
+        public DateTime? AppliedDate { get; set; }
 
+        public DateTime? ScheduleMeetingDate { get; set; }
+        public string? RejectionReason { get; set; }
+
+        public string? Status { get; set; }
+
+        public bool IsStatusSelected { get; set; }
 
     }
 }

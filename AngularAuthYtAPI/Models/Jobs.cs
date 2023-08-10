@@ -12,10 +12,17 @@ namespace AngularAuthYtAPI.Models
 
         public string? Skills { get; set; }
 
+        public int Positions { get; set; }
+    
+        public string? Qualification { get; set; }
+
+
         public string? JobType { get; set; }
         public DateTime? PostedDate { get; set; }
 
+        public DateTime EndDate { get; set; }
 
+        public float? Salary { get; set; }
         public string? Location { get; set; }
 
         public string? JobDescription { get; set; }
@@ -26,3 +33,8 @@ namespace AngularAuthYtAPI.Models
 
     }
 }
+
+
+
+
+ 

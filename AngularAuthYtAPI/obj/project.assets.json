@@ -2273,19 +2273,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\nares\\.nuget\\packages\\": {}
+    "C:\\Users\\Naresh Y\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\nares\\Source\\Repos\\JOBSPORTALPROJECT\\AngularAuthYtAPI\\AngularAuthYtAPI.csproj",
+      "projectUniqueName": "C:\\Users\\Naresh Y\\Source\\Repos\\Jobsproject\\AngularAuthYtAPI\\AngularAuthYtAPI.csproj",
       "projectName": "AngularAuthYtAPI",
-      "projectPath": "C:\\Users\\nares\\Source\\Repos\\JOBSPORTALPROJECT\\AngularAuthYtAPI\\AngularAuthYtAPI.csproj",
-      "packagesPath": "C:\\Users\\nares\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\nares\\Source\\Repos\\JOBSPORTALPROJECT\\AngularAuthYtAPI\\obj\\",
+      "projectPath": "C:\\Users\\Naresh Y\\Source\\Repos\\Jobsproject\\AngularAuthYtAPI\\AngularAuthYtAPI.csproj",
+      "packagesPath": "C:\\Users\\Naresh Y\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Naresh Y\\Source\\Repos\\Jobsproject\\AngularAuthYtAPI\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\nares\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Naresh Y\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -2293,7 +2293,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\sdk\\7.0.306\\Sdks\\Microsoft.NET.Sdk.Web\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -2354,7 +2353,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

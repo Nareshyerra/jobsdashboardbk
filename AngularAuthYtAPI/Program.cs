@@ -1,4 +1,6 @@
 using AngularAuthYtAPI.Context;
+using AngularAuthYtAPI.Interface;
+using AngularAuthYtAPI.Respository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,6 +17,9 @@ builder.Services.AddCors(options =>
         .AllowAnyHeader()
         .AllowCredentials());
 });
+
+
+builder.Services.AddScoped<IJobsRepository, JobsRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

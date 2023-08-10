@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using AngularAuthYtAPI.Models;
 using AngularAuthYtAPI.Context;
 using System.Security.Claims;
+using AngularAuthYtAPI.Interface;
 
 namespace AngularAuthYtAPI.Controllers
 {
@@ -17,51 +18,49 @@ namespace AngularAuthYtAPI.Controllers
     [Route("api/[controller]")]
     public class JobsController : ControllerBase
     {
-        private readonly AppDbContext _context;
-        
+        private readonly IJobsRepository _jobsRepository;
 
-
-        public JobsController(AppDbContext context)
+        public JobsController(IJobsRepository jobsRepository)
         {
-            _context = context;
-          
+            _jobsRepository = jobsRepository;
         }
 
 
+
         //[HttpGet("Jobs")]
-        //public async Task<ActionResult<IEnumerable<Jobs>>> GetAllJobs()
+        //public async Task<ActionResult<IEnumerable<Jobs>>> GetAllJobs(string AppliedUsername)
         //{
-        //    // Retrieve all jobs and return as ActionResult
         //    var jobs = await _context.job.ToListAsync();
+
+        //    if (!string.IsNullOrEmpty(AppliedUsername))
+        //    {
+        //        var AppliedId = await _context.AppliedJob
+        //            .Where(applieds => applieds.AppliedUsername == AppliedUsername)
+        //            .Select(applieds => applieds.JobId)
+        //            .ToListAsync();
+
+        //        // Update the ischecked property based on appliedJobIds
+        //        foreach (var job in jobs)
+        //        {
+        //            job.ischecked = AppliedId.Contains(job.JobId);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        // If no username provided, set ischecked to false for all jobs
+        //        foreach (var job in jobs)
+        //        {
+        //            job.ischecked = false;
+        //        }
+        //    }
+
         //    return Ok(jobs);
         //}
 
         [HttpGet("Jobs")]
-        public async Task<ActionResult<IEnumerable<Jobs>>> GetAllJobs(string AppliedUsername)
+        public async Task<ActionResult<IEnumerable<Jobs>>> GetAllJobs(string appliedUsername)
         {
-            var jobs = await _context.job.ToListAsync();
-
-            if (!string.IsNullOrEmpty(AppliedUsername))
-            {
-                var AppliedId = await _context.AppliedJob
-                    .Where(applieds => applieds.AppliedUsername == AppliedUsername)
-                    .Select(applieds => applieds.JobId)
-                    .ToListAsync();
-
-                // Update the ischecked property based on appliedJobIds
-                foreach (var job in jobs)
-                {
-                    job.ischecked = AppliedId.Contains(job.JobId);
-                }
-            }
-            else
-            {
-                // If no username provided, set ischecked to false for all jobs
-                foreach (var job in jobs)
-                {
-                    job.ischecked = false;
-                }
-            }
+            var jobs = await _jobsRepository.GetAllJobs(appliedUsername);
 
             return Ok(jobs);
         }
@@ -69,6 +68,33 @@ namespace AngularAuthYtAPI.Controllers
 
 
 
+
+        [HttpGet("count/{username}")]
+        public async Task<IActionResult> GetTotalJobsCount(string username)
+        {
+            int jobsCount = await _jobsRepository.GetTotalJobsCount(username);
+            return Ok(jobsCount);
+        }
+
+
+
+        [HttpGet("TotalAppliedJobsCount/{username}")]
+        public async Task<int> GetTotalAppliedJobsCount(string username)
+        {
+            return await _jobsRepository.GetTotalAppliedJobsCount(username);
+        }
+
+    
+
+
+        [HttpGet("NotAppliedJobsCount/{username}")]
+        public async Task<int> GetNotAppliedJobsCount(string username)
+        {
+            var totalJobsCount = await _jobsRepository.GetTotalJobsCount(username);
+            var appliedJobsCount = await _jobsRepository.GetTotalAppliedJobsCount(username);
+            var notAppliedJobsCount = totalJobsCount - appliedJobsCount;
+            return notAppliedJobsCount;
+        }
 
 
 
@@ -76,106 +102,56 @@ namespace AngularAuthYtAPI.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Jobs>>> GetJobsByUser(string username)
         {
-            var jobs = await _context.job.Where(job => job.Username == username).ToListAsync();
+            var jobs = await _jobsRepository.GetJobsByUser(username);
             return Ok(jobs);
         }
 
 
 
 
-
-        [HttpPost("Addjobsdata")]
-
-        public async Task<IActionResult> AddJobsdata([FromBody] Jobs jobsObj)
-
+        [HttpPost]
+        public async Task<IActionResult> AddJobsdata(Jobs job)
         {
-
-            if (jobsObj == null)
-
-                return BadRequest();
-
-
-
-            await _context.job.AddAsync(jobsObj);
-
-            await _context.SaveChangesAsync();
-
-
-
-            return Ok(new
-
-            {
-
-                Message = "Job Added Successfully!"
-
-            });
-
+            job.PostedDate = DateTime.UtcNow;
+            job.EndDate = DateTime.UtcNow;
+            await _jobsRepository.AddJobsdata(job);
+            return Ok();
         }
 
 
-
-
-        [HttpPut("editjobsdata/{id}")]
-        public async Task<IActionResult> EditJobsdata(int id, [FromBody] Models.Jobs updatedJobsObj)
+        [HttpPut("editjobsdata/{jobId}")]
+        public async Task<IActionResult> EditJobsdata(int jobId, Jobs updatedJob)
         {
-            if (updatedJobsObj == null || id != updatedJobsObj.JobId)
-                return BadRequest();
-
-
-
-            var job = await _context.job.FindAsync(id);
-            if (job == null)
+            // Retrieve the existing job from the database
+            var existingJob = await _jobsRepository.GetJob(jobId);
+            if (existingJob == null)
                 return NotFound();
 
+            // Update only the specified properties from the updatedJob object
+            existingJob.CompanyName = updatedJob.CompanyName;
+            existingJob.JobTitle = updatedJob.JobTitle;
+            existingJob.Experience = updatedJob.Experience;
+            existingJob.Skills = updatedJob.Skills;
+            existingJob.JobType = updatedJob.JobType;
+            existingJob.Qualification = updatedJob.Qualification;
+            existingJob.Location = updatedJob.Location;
+            existingJob.Positions = updatedJob.Positions;
 
+            existingJob.Salary = updatedJob.Salary;
+            existingJob.JobDescription = updatedJob.JobDescription;
 
-            job.CompanyName = updatedJobsObj.CompanyName;
-            job.JobTitle = updatedJobsObj.JobTitle;
-            job.Experience = updatedJobsObj.Experience;
-            job.Skills = updatedJobsObj.Skills;
-            job.JobType = updatedJobsObj.JobType;
-            job.PostedDate = updatedJobsObj.PostedDate;
-            job.Location = updatedJobsObj.Location;
-            job.JobDescription = updatedJobsObj.JobDescription;
-
-
-
-
-
-
-            await _context.SaveChangesAsync();
-
-
-
-            return Ok(new
-            {
-                Message = "Job Updated Successfully!"
-            });
+            await _jobsRepository.EditJobsdata(existingJob);
+            return Ok();
         }
-
 
 
 
         [HttpDelete("deletejobsdata/{id}")]
-        public async Task<IActionResult> DeleteJobsdata(int id)
+        public async Task<IActionResult> DeleteJobsdata(int jobId)
         {
-            var job = await _context.job.FindAsync(id);
-            if (job == null)
-                return NotFound();
-
-
-
-            _context.job.Remove(job);
-            await _context.SaveChangesAsync();
-
-
-
-            return Ok(new
-            {
-                Message = "Job Deleted Successfully!"
-            });
+            await _jobsRepository.DeleteJobsdata(jobId);
+            return Ok();
         }
-
 
         public class JobsRequest
         {
