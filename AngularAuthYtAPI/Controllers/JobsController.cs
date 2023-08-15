@@ -146,7 +146,7 @@ namespace AngularAuthYtAPI.Controllers
 
 
 
-        [HttpDelete("deletejobsdata/{id}")]
+        [HttpDelete("deletejobsdata/{jobId}")]
         public async Task<IActionResult> DeleteJobsdata(int jobId)
         {
             await _jobsRepository.DeleteJobsdata(jobId);

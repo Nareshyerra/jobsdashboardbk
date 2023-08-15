@@ -10,7 +10,7 @@ namespace AngularAuthYtAPI.Context
         {
 
         }
-        public DbSet<User> Users { get; set; }
+        public DbSet<Client> Users { get; set; }
         public DbSet<Jobs> job { get; set; }
      
 
@@ -25,7 +25,7 @@ namespace AngularAuthYtAPI.Context
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<User>().ToTable("users");
+            builder.Entity<Client>().ToTable("users");
             builder.Entity<Jobs>().ToTable("job");
             builder.Entity<applicant>().ToTable("Applicant");
            

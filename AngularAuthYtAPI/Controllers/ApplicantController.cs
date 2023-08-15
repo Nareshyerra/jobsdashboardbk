@@ -58,6 +58,27 @@ namespace AngularAuthYtAPI.Controllers
             });
         }
 
+
+        [HttpGet("userdetails/{username}")]
+        public async Task<IActionResult> GetUserDetails(string username)
+        {
+            var user = await _authContext.Applicant
+                .FirstOrDefaultAsync(x => x.Username == username);
+
+            if (user == null)
+                return NotFound(new { Message = "User not found!" });
+
+            var userDetails = new
+            {
+                Username = user.Username,
+                Email = user.Email
+            };
+
+            return Ok(userDetails);
+        }
+
+
+
         [HttpPost("register")]
         public async Task<IActionResult> AddApplicant([FromBody] applicant applicantObj)
         {

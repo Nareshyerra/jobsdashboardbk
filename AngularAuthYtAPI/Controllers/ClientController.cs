@@ -19,16 +19,16 @@ namespace AngularAuthYtAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class ClientController : ControllerBase
     {
         private readonly AppDbContext _authContext;
-        public UserController(AppDbContext context)
+        public ClientController(AppDbContext context)
         {
             _authContext = context;
         }
 
         [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody] User userObj)
+        public async Task<IActionResult> Authenticate([FromBody] Client userObj)
         {
             if (userObj == null)
                 return BadRequest();
@@ -59,7 +59,7 @@ namespace AngularAuthYtAPI.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> AddUser([FromBody] User userObj)
+        public async Task<IActionResult> AddUser([FromBody] Client userObj)
         {
             if (userObj == null)
                 return BadRequest();
@@ -106,7 +106,7 @@ namespace AngularAuthYtAPI.Controllers
             return sb.ToString();
         }
 
-        private string CreateJwt(User user)
+        private string CreateJwt(Client user)
         {
             var jwtTokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes("veryverysceret.....");
@@ -165,7 +165,7 @@ namespace AngularAuthYtAPI.Controllers
 
         [Authorize]
         [HttpGet]
-        public async Task<ActionResult<User>> GetAllUsers()
+        public async Task<ActionResult<Client>> GetAllUsers()
         {
             return Ok(await _authContext.Users.ToListAsync());
         }
