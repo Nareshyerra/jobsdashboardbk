@@ -27,36 +27,6 @@ namespace AngularAuthYtAPI.Controllers
 
 
 
-        //[HttpGet("Jobs")]
-        //public async Task<ActionResult<IEnumerable<Jobs>>> GetAllJobs(string AppliedUsername)
-        //{
-        //    var jobs = await _context.job.ToListAsync();
-
-        //    if (!string.IsNullOrEmpty(AppliedUsername))
-        //    {
-        //        var AppliedId = await _context.AppliedJob
-        //            .Where(applieds => applieds.AppliedUsername == AppliedUsername)
-        //            .Select(applieds => applieds.JobId)
-        //            .ToListAsync();
-
-        //        // Update the ischecked property based on appliedJobIds
-        //        foreach (var job in jobs)
-        //        {
-        //            job.ischecked = AppliedId.Contains(job.JobId);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        // If no username provided, set ischecked to false for all jobs
-        //        foreach (var job in jobs)
-        //        {
-        //            job.ischecked = false;
-        //        }
-        //    }
-
-        //    return Ok(jobs);
-        //}
-
         [HttpGet("Jobs")]
         public async Task<ActionResult<IEnumerable<Jobs>>> GetAllJobs(string appliedUsername)
         {
@@ -136,6 +106,8 @@ namespace AngularAuthYtAPI.Controllers
             existingJob.Qualification = updatedJob.Qualification;
             existingJob.Location = updatedJob.Location;
             existingJob.Positions = updatedJob.Positions;
+            existingJob.EndDate = updatedJob.EndDate;
+            existingJob.PostedDate = updatedJob.PostedDate;
 
             existingJob.Salary = updatedJob.Salary;
             existingJob.JobDescription = updatedJob.JobDescription;

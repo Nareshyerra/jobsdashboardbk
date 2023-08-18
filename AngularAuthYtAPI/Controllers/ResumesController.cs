@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -140,25 +141,24 @@ namespace AngularAuthYtAPI.Controllers
             return File(memoryStream, "application/octet-stream", resume.FileName);
         }
 
-        //
+        
+        
+        //status
 
         [HttpPost("{resumeId}/ScheduleMeeting")]
         public async Task<IActionResult> ScheduleMeeting(int resumeId, [FromBody] ScheduleMeetingRequest request)
         {
             var resume = await _context.Resumes.FindAsync(resumeId);
-
             if (resume == null)
             {
                 return NotFound();
             }
-
-            // Assuming you have some validation for the meeting date in the request
-            resume.ScheduleMeetingDate = request.ScheduleMeetingDate;
-            resume.Status = "Meeting Scheduled"; // Update the status here, you can adjust it according to your requirement.
+        
+            resume.ScheduleMeetingDate = DateTime.UtcNow;
+            resume.Status = "Meeting Scheduled";
             resume.IsStatusSelected = true;
 
             await _context.SaveChangesAsync();
-
             return Ok(new { message = "Meeting has been scheduled successfully." });
         }
 
@@ -173,7 +173,7 @@ namespace AngularAuthYtAPI.Controllers
             }
 
             resume.RejectionReason = request.RejectionReason;
-            resume.Status = "Rejected"; // Update the status here, you can adjust it according to your requirement.
+            resume.Status = "Rejected"; 
             resume.IsStatusSelected = true;
 
             await _context.SaveChangesAsync();
@@ -258,7 +258,7 @@ namespace AngularAuthYtAPI.Controllers
 
             }
 
-            //return Ok(resume.RejectionReason);
+          
             return Ok(new { RejectionReason = resume.RejectionReason });
 
         }
@@ -266,7 +266,7 @@ namespace AngularAuthYtAPI.Controllers
         [HttpGet("RecentApplicants")]
         public async Task<ActionResult<IEnumerable<RecentApplicantViewModel>>> GetRecentApplicants()
         {
-            // You can define "recent" as per your requirement, for example, the last 30 days.
+           
             DateTime startDate = DateTime.UtcNow.AddDays(-30);
 
             var recentApplicants = await _context.Resumes
@@ -292,11 +292,7 @@ namespace AngularAuthYtAPI.Controllers
             return recentApplicants;
         }
 
-        //[HttpGet("TotalApplicantsCount")]
-        //public async Task<int> GetTotalApplicantsCount()
-        //{
-        //    return await _context.Resumes.CountAsync();
-        //}
+      
 
 
 
@@ -328,6 +324,132 @@ namespace AngularAuthYtAPI.Controllers
                 .CountAsync();
         }
 
+
+        //charts
+        [HttpGet("ApplicantsPerWeek")]
+        public async Task<ActionResult<List<WeekApplicantCount>>> GetApplicantsPerWeek(string username, int year, int week)
+        {
+            var applicantsWithAppliedDate = await _context.Resumes
+                .Where(resume =>
+                    resume.job.Username == username &&
+                    resume.AppliedDate.HasValue &&
+                    resume.AppliedDate.Value.Year == year)
+                .ToListAsync();
+
+
+
+            var weekCounts = new List<WeekApplicantCount>();
+
+
+
+            // Calculate the current ISO week number for reference
+            var currentWeek = GetIsoWeekOfYear(DateTime.UtcNow);
+
+
+
+            // Calculate the starting week for the range (selected week - 4)
+            var startingWeek = week - 4;
+
+
+
+            // Adjust the starting week if it's before week 1
+            if (startingWeek < 1)
+            {
+                startingWeek = 1;
+            }
+
+
+
+            // Calculate the ending week for the range (selected week)
+            var endingWeek = week;
+
+
+
+            // Iterate through the specified range of weeks
+            for (int weekNumber = startingWeek; weekNumber <= endingWeek; weekNumber++)
+            {
+                var applicantCount = applicantsWithAppliedDate
+                    .Count(resume => GetIsoWeekOfYear(resume.AppliedDate.Value) == weekNumber);
+
+
+
+                weekCounts.Add(new WeekApplicantCount
+                {
+                    WeekNumber = weekNumber,
+                    ApplicantCount = applicantCount
+                });
+            }
+
+
+
+            return Ok(weekCounts);
+        }
+
+
+        [HttpGet("SchedulingMeetingCount")]
+        public async Task<ActionResult<int>> GetSchedulingMeetingCount(string username)
+        {
+            int schedulingMeetingCount = await _context.Resumes
+                .Where(resume => resume.job.Username == username && resume.ScheduleMeetingDate.HasValue)
+                .CountAsync();
+
+
+
+            return schedulingMeetingCount;
+        }
+
+
+
+        [HttpGet("NonScheduledMeetingCount")]
+        public async Task<ActionResult<int>> GetNonScheduledMeetingCount(string username)
+        {
+            int nonScheduledMeetingCount = await _context.Resumes
+                .Where(resume => resume.job.Username == username && !resume.ScheduleMeetingDate.HasValue)
+                .CountAsync();
+
+
+
+            return nonScheduledMeetingCount;
+        }
+
+
+
+        [HttpGet("RejectedCount")]
+        public async Task<ActionResult<int>> GetRejectedCount(string username)
+        {
+            int rejectedCount = await _context.Resumes
+                .Where(resume => resume.job.Username == username && resume.Status == "Rejected")
+                .CountAsync();
+
+
+
+            return rejectedCount;
+        }
+        [HttpGet("NoStatusCount")]
+        public async Task<ActionResult<int>> GetNoStatusCount(string username)
+        {
+            int noStatusCount = await _context.Resumes
+                .Where(resume => resume.job.Username == username && !resume.IsStatusSelected)
+                .CountAsync();
+
+
+
+            return noStatusCount;
+        }
+
+
+        private int GetIsoWeekOfYear(DateTime date)
+        {
+            var cal = CultureInfo.InvariantCulture.Calendar;
+            var day = (int)cal.GetDayOfWeek(date);
+            date = date.AddDays(4 - day).Date;
+            return cal.GetWeekOfYear(date, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        }
+        public class WeekApplicantCount
+        {
+            public int WeekNumber { get; set; }
+            public int ApplicantCount { get; set; }
+        }
 
 
     }

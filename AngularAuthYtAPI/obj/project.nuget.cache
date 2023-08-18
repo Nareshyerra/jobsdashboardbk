@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "+Jwn/R7IxKFBx06488x/ekqg2arsAAghGyfsp/rleHuJIpCSTK/Eg5immn5pNpwoLzonGyLT6qvVJzAn7lWRqw==",
+  "dgSpecHash": "Ppka/V1hCcls7edOsrzUbUYf+/n4VgIq+5CSUGGiYAXhIRKyNQUxZMWzemlEOGQGG2tsmT/8dIqyGNTbygLwRg==",
   "success": true,
   "projectFilePath": "C:\\Users\\Naresh Y\\source\\repos\\Jobsproject\\AngularAuthYtAPI\\AngularAuthYtAPI.csproj",
   "expectedPackageFiles": [
@@ -53,7 +53,11 @@
     "C:\\Users\\Naresh Y\\.nuget\\packages\\system.security.permissions\\4.7.0\\system.security.permissions.4.7.0.nupkg.sha512",
     "C:\\Users\\Naresh Y\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512",
     "C:\\Users\\Naresh Y\\.nuget\\packages\\system.text.encoding.codepages\\4.7.0\\system.text.encoding.codepages.4.7.0.nupkg.sha512",
-    "C:\\Users\\Naresh Y\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512"
+    "C:\\Users\\Naresh Y\\.nuget\\packages\\system.windows.extensions\\4.7.0\\system.windows.extensions.4.7.0.nupkg.sha512",
+    "C:\\Users\\Naresh Y\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.21\\microsoft.windowsdesktop.app.ref.6.0.21.nupkg.sha512",
+    "C:\\Users\\Naresh Y\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.21\\microsoft.netcore.app.ref.6.0.21.nupkg.sha512",
+    "C:\\Users\\Naresh Y\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.21\\microsoft.aspnetcore.app.ref.6.0.21.nupkg.sha512",
+    "C:\\Users\\Naresh Y\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\6.0.21\\microsoft.netcore.app.host.win-x64.6.0.21.nupkg.sha512"
   ],
   "logs": []
 }
